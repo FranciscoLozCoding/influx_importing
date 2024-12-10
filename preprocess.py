@@ -3,6 +3,7 @@ import re
 import os
 import yaml
 from dateutil.parser import parse
+import subprocess
 
 #                   NOTE: CHANGE THE VARIABLES TO YOUR PREPROCESSING NEEDS
 ########################################################################################################
@@ -360,4 +361,24 @@ if all_dataframes:
         out_csv.write(datatype_line + "\n")
         out_csv.write(default_line + "\n")
         import_df.to_csv(out_csv, index=False)
-    print(f"Import file for Influx saved to {output_file}")
+
+    # Test the import.csv file in a influx import dry run
+
+    ## Build the dry-run command
+    command = [ "influx", "write", "dryrun", "--file", output_file]
+
+    try:
+        # Run the command
+        result = subprocess.run(command, capture_output=True, text=True, check=True)
+        
+        # Check and process the logged errors
+        if result.stderr:
+            print("Dry-run logged errors:")
+            print(result.stderr)
+            print(f"\nImport file for Influx has errors review and fix errors, DO NOT import {output_file} until fixed!")
+        else:
+            print("Influx import dry-run successful!")
+            print(f"Import file for Influx saved to {output_file}, ready for import!")
+    except subprocess.CalledProcessError as e:
+        print("Process exited during dry-run:")
+        print(e.stderr)
