@@ -209,12 +209,19 @@ additional_columns = {
 }
 ########################################################################################################
 
+# Define color codes for ANSI escape sequences
+class Color:
+    RESET = "\033[0m"
+    RED = "\033[31m"
+    GREEN = "\033[32m"
+    YELLOW = "\033[33m"
+
 def safe_parse_date(date_str):
     """Try parsing the date, if form is invalid print the original form"""
     try:
         return parse(date_str, dayfirst=True).strftime('%Y-%m-%d')
     except Exception as e:
-        print(f"Error parsing date: {date_str} - {e}")
+        print(f"{Color.RED}Error:{Color.RESET} Cannot parse date {date_str} - {e}")
 
 def match_dt(dt_str):
     """Function to check if the datetime string matches the exact format"""
@@ -235,11 +242,11 @@ def enforce_data_types(df, datatypes):
                 # Check each value in the column for regex match
                 invalid_values = df[~df[col].apply(match_dt)][col]
                 if not invalid_values.empty:
-                    print(f"Error: The following values in column '{col}' are not in dateTime:RFC3339 format:")
+                    print(f"{Color.RED}Error:{Color.RESET}  The following values in column '{col}' are not in dateTime:RFC3339 format:")
                     print(invalid_values.tolist())
                     raise ValueError(f"Datetime values are not in RFC3339.")
             else:
-                print(f"Error: Unexpected 'datatype' in meta.yml, specify new datatype to enforce")
+                print(f"{Color.RED}Error:{Color.RESET} Unexpected 'datatype' in meta.yml, specify new datatype to enforce")
                 raise ValueError(f"Unexpected 'datatype' in meta.yml")
     return df
 
@@ -251,7 +258,7 @@ def validate_columns(df, datatypes):
 
     # Log errors for unexpected columns
     if unexpected_columns:
-        print(f"Error: Unexpected columns please specify 'group' and 'datatype' in meta.yml: {unexpected_columns}")
+        print(f"{Color.RED}Error:{Color.RESET} Unexpected columns please specify 'group' and 'datatype' in meta.yml: {unexpected_columns}")
         raise ValueError(f"Unexpected columns found: {unexpected_columns}")
     
 def generate_csv_headers(group, datatype, defaults, df):
@@ -331,20 +338,20 @@ for filename in os.listdir(input_directory):
             # Save the transformed and filtered data to a new CSV file in the output directory
             output_file = os.path.join(output_directory, filename)
             df_melted.to_csv(output_file, index=False)
-            print(f"Preprocessed data saved to {output_file}")
+            print(f"Preprocessed data saved to {output_file}...")
 
             # Append to the list of all dataframes
             all_dataframes.append(df_melted)
         except FileNotFoundError:
-            print(f"Error: File '{input_file}' not found.")
+            print(f"{Color.RED}Error:{Color.RESET} File '{input_file}' not found.")
         except KeyError as e:
-            print(f"Error: Missing expected column in '{filename}'. Details: {e}")
+            print(f"{Color.RED}Error:{Color.RESET} Missing expected column in '{filename}'. Details: {e}")
 
 # Concatenate all dataframes and save to CSV file
 if all_dataframes:
     df = pd.concat(all_dataframes, ignore_index=True)
     df.to_csv(os.path.join(output_directory, 'all.csv'), index=False)
-    print("All data combined and saved to all.csv")
+    print(f"{Color.GREEN}All data combined and saved to all.csv!{Color.RESET}")
 
     # Format a new csv to import into influx
 
@@ -373,12 +380,12 @@ if all_dataframes:
         
         # Check and process the logged errors
         if result.stderr:
-            print("Dry-run logged errors:")
+            print(f"{Color.RED}Dry-run logged errors:{Color.RESET}")
             print(result.stderr)
-            print(f"\nImport file for Influx has errors review and fix errors, DO NOT import {output_file} until fixed!")
+            print(f"\n{Color.RED}Error:{Color.RESET} Import file for Influx has errors review and fix errors, DO NOT import {output_file} until fixed!")
         else:
-            print("Influx import dry-run successful!")
-            print(f"Import file for Influx saved to {output_file}, ready for import!")
+            print(f"{Color.GREEN}Influx import dry-run successful!{Color.RESET}")
+            print(f"Import file for Influx saved to {output_file}... \n{Color.GREEN}Ready for import!{Color.RESET}")
     except subprocess.CalledProcessError as e:
-        print("Process exited during dry-run:")
+        print(f"{Color.RED}Error:{Color.RESET} Process exited during dry-run")
         print(e.stderr)
