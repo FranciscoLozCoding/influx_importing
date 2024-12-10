@@ -1,0 +1,89 @@
+columns: #The order of the columns define the order in import.csv
+  result: 
+    datatype: string
+    group: false
+    default: ""
+  _time:
+    datatype: dateTime:RFC3339
+    group: false
+    default: ""
+  _value:
+    datatype: double
+    group: false
+    default: ""
+  _field:
+    datatype: string
+    group: true
+    default: ""
+  _measurement:
+    datatype: string
+    group: true
+    default: ""
+  applicationId:
+    datatype: string
+    group: true
+    default: ""
+  applicationName:
+    datatype: string
+    group: true
+    default: ""
+  deviceProfileId:
+    datatype: string
+    group: true
+    default: ""
+  deviceProfileName:
+    datatype: string
+    group: true
+    default: ""
+  host:
+    datatype: string
+    group: true
+    default: ""
+  job:
+    datatype: string
+    group: true
+    default: ""
+  node:
+    datatype: string
+    group: true
+    default: ""
+  plugin:
+    datatype: string
+    group: true
+    default: ""
+  serial_number_tag:
+    datatype: string
+    group: true
+    default: ""
+  task:
+    datatype: string
+    group: true
+    default: ""
+  tenantId:
+    datatype: string
+    group: true
+    default: ""
+  tenantName:
+    datatype: string
+    group: true
+    default: ""
+  vsn:
+    datatype: string
+    group: true
+    default: ""
+  zone:
+    datatype: string
+    group: true
+    default: ""
+  devAddr:
+    datatype: string
+    group: true
+    default: ""
+  devEui:
+    datatype: string
+    group: true
+    default: ""
+  deviceName:
+    datatype: string
+    group: true
+    default: ""
